@@ -149,7 +149,7 @@ class VM(object):
         assert self._qmp.is_scm_available()
         bin = socket_scm_helper
         if os.path.exists(bin) == False:
-            print "Scm help program does not present, path '%s'." % bin
+            print("Scm help program does not present, path '%s'." % bin)
             return -1
         fd_param = ["%s" % bin,
                     "%d" % self._qmp.get_sock_fd(),
@@ -188,7 +188,7 @@ class VM(object):
     def qmp(self, cmd, conv_keys=True, **args):
         '''Invoke a QMP command and return the result dict'''
         qmp_args = dict()
-        for k in args.keys():
+        for k in list(args.keys()):
             if conv_keys:
                 qmp_args[k.translate(self.underscore_to_dash)] = args[k]
             else:
@@ -294,7 +294,7 @@ def notrun(reason):
     seq = os.path.basename(sys.argv[0])
 
     open('%s/%s.notrun' % (output_dir, seq), 'wb').write(reason + '\n')
-    print '%s not run: %s' % (seq, reason)
+    print('%s not run: %s' % (seq, reason))
     sys.exit(0)
 
 def main(supported_fmts=[], supported_oses=['linux']):
@@ -308,8 +308,8 @@ def main(supported_fmts=[], supported_oses=['linux']):
 
     # We need to filter out the time taken from the output so that qemu-iotest
     # can reliably diff the results against master output.
-    import StringIO
-    output = StringIO.StringIO()
+    import io
+    output = io.StringIO()
 
     class MyTestRunner(unittest.TextTestRunner):
         def __init__(self, stream=output, descriptions=True, verbosity=1):

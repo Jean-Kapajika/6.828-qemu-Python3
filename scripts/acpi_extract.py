@@ -357,7 +357,7 @@ def get_value_type(maxvalue):
             return "char"
 
 # Pretty print output
-for array in output.keys():
+for array in list(output.keys()):
     otype = get_value_type(max(output[array]))
     odata = []
     for value in output[array]:

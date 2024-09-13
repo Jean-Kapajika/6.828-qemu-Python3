@@ -133,20 +133,20 @@ class QMPShell(qmp.QEMUMonitorProtocol):
     def _execute_cmd(self, cmdline):
         try:
             qmpcmd = self.__build_cmd(cmdline)
-        except Exception, e:
-            print 'Error while parsing command line: %s' % e
-            print 'command format: <command-name> ',
-            print '[arg-name1=arg1] ... [arg-nameN=argN]'
+        except Exception as e:
+            print('Error while parsing command line: %s' % e)
+            print('command format: <command-name> ', end=' ')
+            print('[arg-name1=arg1] ... [arg-nameN=argN]')
             return True
         resp = self.cmd_obj(qmpcmd)
         if resp is None:
-            print 'Disconnected'
+            print('Disconnected')
             return False
 
         if self._pp is not None:
             self._pp.pprint(resp)
         else:
-            print resp
+            print(resp)
         return True
 
     def connect(self):
@@ -154,9 +154,9 @@ class QMPShell(qmp.QEMUMonitorProtocol):
         self.__completer_setup()
 
     def show_banner(self, msg='Welcome to the QMP low-level shell!'):
-        print msg
+        print(msg)
         version = self._greeting['QMP']['version']['qemu']
-        print 'Connected to QEMU %d.%d.%d\n' % (version['major'],version['minor'],version['micro'])
+        print('Connected to QEMU %d.%d.%d\n' % (version['major'],version['minor'],version['micro']))
 
     def read_exec_command(self, prompt):
         """
@@ -165,13 +165,13 @@ class QMPShell(qmp.QEMUMonitorProtocol):
         @return True if execution was ok, return False if disconnected.
         """
         try:
-            cmdline = raw_input(prompt)
+            cmdline = input(prompt)
         except EOFError:
-            print
+            print()
             return False
         if cmdline == '':
             for ev in self.get_events():
-                print ev
+                print(ev)
             self.clear_events()
             return True
         else:
@@ -224,24 +224,24 @@ class HMPShell(QMPShell):
             try:
                 idx = int(cmdline.split()[1])
                 if not 'return' in self.__cmd_passthrough('info version', idx):
-                    print 'bad CPU index'
+                    print('bad CPU index')
                     return True
                 self.__cpu_index = idx
             except ValueError:
-                print 'cpu command takes an integer argument'
+                print('cpu command takes an integer argument')
                 return True
         resp = self.__cmd_passthrough(cmdline, self.__cpu_index)
         if resp is None:
-            print 'Disconnected'
+            print('Disconnected')
             return False
         assert 'return' in resp or 'error' in resp
         if 'return' in resp:
             # Success
             if len(resp['return']) > 0:
-                print resp['return'],
+                print(resp['return'], end=' ')
         else:
             # Error
-            print '%s: %s' % (resp['error']['class'], resp['error']['desc'])
+            print('%s: %s' % (resp['error']['class'], resp['error']['desc']))
         return True
 
     def show_banner(self):

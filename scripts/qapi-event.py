@@ -223,8 +223,8 @@ try:
     opts, args = getopt.gnu_getopt(sys.argv[1:], "chbp:i:o:",
                                    ["source", "header", "builtins", "prefix=",
                                     "input-file=", "output-dir="])
-except getopt.GetoptError, err:
-    print str(err)
+except getopt.GetoptError as err:
+    print((str(err)))
     sys.exit(1)
 
 input_file = ""
@@ -260,7 +260,7 @@ h_file = output_dir + prefix + h_file
 
 try:
     os.makedirs(output_dir)
-except os.error, e:
+except os.error as e:
     if e.errno != errno.EEXIST:
         raise
 
@@ -268,8 +268,8 @@ def maybe_open(really, name, opt):
     if really:
         return open(name, opt)
     else:
-        import StringIO
-        return StringIO.StringIO()
+        import io
+        return io.StringIO()
 
 fdef = maybe_open(do_c, c_file, 'w')
 fdecl = maybe_open(do_h, h_file, 'w')
@@ -332,7 +332,7 @@ event_enum_values = []
 event_enum_strings = []
 
 for expr in exprs:
-    if expr.has_key('event'):
+    if 'event' in expr:
         event_name = expr['event']
         params = expr.get('data')
         if params and len(params) == 0:

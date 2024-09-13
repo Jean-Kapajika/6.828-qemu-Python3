@@ -116,7 +116,7 @@ class QAPISchema:
                     continue
                 try:
                     fobj = open(include_path, 'r')
-                except IOError, e:
+                except IOError as e:
                     raise QAPIExprError(expr_info,
                                         '%s: %s' % (e.strerror, include))
                 exprs_include = QAPISchema(fobj, include, self.include_hist,
@@ -305,7 +305,7 @@ def check_union(expr, expr_info):
                                 "type" % discriminator)
 
     # Check every branch
-    for (key, value) in members.items():
+    for (key, value) in list(members.items()):
         # If this named member's value names an enum type, then all members
         # of 'data' must also be members of the enum type.
         if enum_define and not key in enum_define['enum_values']:
@@ -319,47 +319,47 @@ def check_union(expr, expr_info):
 def check_exprs(schema):
     for expr_elem in schema.exprs:
         expr = expr_elem['expr']
-        if expr.has_key('union'):
+        if 'union' in expr:
             check_union(expr, expr_elem['info'])
-        if expr.has_key('event'):
+        if 'event' in expr:
             check_event(expr, expr_elem['info'])
 
 def parse_schema(input_file):
     try:
         schema = QAPISchema(open(input_file, "r"))
-    except (QAPISchemaError, QAPIExprError), e:
-        print >>sys.stderr, e
+    except (QAPISchemaError, QAPIExprError) as e:
+        print(e, file=sys.stderr)
         exit(1)
 
     exprs = []
 
     for expr_elem in schema.exprs:
         expr = expr_elem['expr']
-        if expr.has_key('enum'):
+        if 'enum' in expr:
             add_enum(expr['enum'], expr['data'])
-        elif expr.has_key('union'):
+        elif 'union' in expr:
             add_union(expr)
-        elif expr.has_key('type'):
+        elif 'type' in expr:
             add_struct(expr)
         exprs.append(expr)
 
     # Try again for hidden UnionKind enum
     for expr_elem in schema.exprs:
         expr = expr_elem['expr']
-        if expr.has_key('union'):
+        if 'union' in expr:
             if not discriminator_find_enum_define(expr):
                 add_enum('%sKind' % expr['union'])
 
     try:
         check_exprs(schema)
-    except QAPIExprError, e:
-        print >>sys.stderr, e
+    except QAPIExprError as e:
+        print(e, file=sys.stderr)
         exit(1)
 
     return exprs
 
 def parse_args(typeinfo):
-    if isinstance(typeinfo, basestring):
+    if isinstance(typeinfo, str):
         struct = find_struct(typeinfo)
         assert struct != None
         typeinfo = struct['data']
@@ -539,7 +539,7 @@ def pop_indent(indent_amount=4):
 def cgen(code, **kwds):
     indent = genindent(indent_level)
     lines = code.split('\n')
-    lines = map(lambda x: indent + x, lines)
+    lines = [indent + x for x in lines]
     return '\n'.join(lines) % kwds + '\n'
 
 def mcgen(code, **kwds):

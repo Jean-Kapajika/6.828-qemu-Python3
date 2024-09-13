@@ -278,7 +278,7 @@ def detect_platform():
 detect_platform()
 
 def invert(d):
-    return dict((x[1], x[0]) for x in d.iteritems())
+    return dict((x[1], x[0]) for x in d.items())
 
 filters = {}
 filters['kvm_userspace_exit'] = ('reason', invert(userspace_exit_reasons))
@@ -352,8 +352,8 @@ class Group(object):
     def read(self):
         bytes = 8 * (1 + len(self.events))
         fmt = 'xxxxxxxx' + 'q' * len(self.events)
-        return dict(zip([event.name for event in self.events],
-                        struct.unpack(fmt, self.file.read(bytes))))
+        return dict(list(zip([event.name for event in self.events],
+                        struct.unpack(fmt, self.file.read(bytes)))))
 
 class Event(object):
     def __init__(self, group, name, event_set, tracepoint, filter = None):
@@ -401,7 +401,7 @@ class TracepointProvider(object):
         for f in fields:
             if f in filters:
                 subfield, values = filters[f]
-                for name, number in values.iteritems():
+                for name, number in values.items():
                     extra.append(f + '(' + name + ')')
         fields += extra
         self._setup(fields)
@@ -457,7 +457,7 @@ class TracepointProvider(object):
         from collections import defaultdict
         ret = defaultdict(int)
         for group in self.group_leaders:
-            for name, val in group.read().iteritems():
+            for name, val in group.read().items():
                 ret[name] += val
         return ret
 
@@ -494,11 +494,11 @@ class Stats:
         return self.values
 
 if not os.access('/sys/kernel/debug', os.F_OK):
-    print 'Please enable CONFIG_DEBUG_FS in your kernel'
+    print('Please enable CONFIG_DEBUG_FS in your kernel')
     sys.exit(1)
 if not os.access('/sys/kernel/debug/kvm', os.F_OK):
-    print "Please mount debugfs ('mount -t debugfs debugfs /sys/kernel/debug')"
-    print "and ensure the kvm modules are loaded"
+    print("Please mount debugfs ('mount -t debugfs debugfs /sys/kernel/debug')")
+    print("and ensure the kvm modules are loaded")
     sys.exit(1)
 
 label_width = 40
@@ -529,7 +529,7 @@ def tui(screen, stats):
                 return (-s[x][1], -s[x][0])
             else:
                 return (0, -s[x][0])
-        for key in sorted(s.keys(), key = sortkey):
+        for key in sorted(list(s.keys()), key = sortkey):
             if row >= screen.getmaxyx()[0]:
                 break
             values = s[key]
@@ -568,19 +568,19 @@ def batch(stats):
     s = stats.get()
     for key in sorted(s.keys()):
         values = s[key]
-        print '%-22s%10d%10d' % (key, values[0], values[1])
+        print('%-22s%10d%10d' % (key, values[0], values[1]))
 
 def log(stats):
-    keys = sorted(stats.get().iterkeys())
+    keys = sorted(stats.get().keys())
     def banner():
         for k in keys:
-            print '%10s' % k[0:9],
-        print
+            print('%10s' % k[0:9], end=' ')
+        print()
     def statline():
         s = stats.get()
         for k in keys:
-            print ' %9d' % s[k][1],
-        print
+            print(' %9d' % s[k][1], end=' ')
+        print()
     line = 0
     banner_repeat = 20
     while True:

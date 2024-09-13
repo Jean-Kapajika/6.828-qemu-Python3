@@ -135,7 +135,7 @@ class QemuGuestAgentClient:
 
     def fsfreeze(self, cmd):
         if cmd not in ['status', 'freeze', 'thaw']:
-            raise StandardError('Invalid command: ' + cmd)
+            raise Exception('Invalid command: ' + cmd)
 
         return getattr(self.qga, 'fsfreeze' + '_' + cmd)()
 
@@ -144,7 +144,7 @@ class QemuGuestAgentClient:
 
     def suspend(self, mode):
         if mode not in ['disk', 'ram', 'hybrid']:
-            raise StandardError('Invalid mode: ' + mode)
+            raise Exception('Invalid mode: ' + mode)
 
         try:
             getattr(self.qga, 'suspend' + '_' + mode)()
@@ -155,7 +155,7 @@ class QemuGuestAgentClient:
 
     def shutdown(self, mode='powerdown'):
         if mode not in ['powerdown', 'halt', 'reboot']:
-            raise StandardError('Invalid mode: ' + mode)
+            raise Exception('Invalid mode: ' + mode)
 
         try:
             self.qga.shutdown(mode=mode)
@@ -168,7 +168,7 @@ def _cmd_cat(client, args):
         print('Invalid argument')
         print('Usage: cat <file>')
         sys.exit(1)
-    print(client.read(args[0]))
+    print((client.read(args[0])))
 
 
 def _cmd_fsfreeze(client, args):
@@ -178,7 +178,7 @@ def _cmd_fsfreeze(client, args):
         print(usage)
         sys.exit(1)
     if args[0] not in ['status', 'freeze', 'thaw']:
-        print('Invalid command: ' + args[0])
+        print(('Invalid command: ' + args[0]))
         print(usage)
         sys.exit(1)
     cmd = args[0]
@@ -186,9 +186,9 @@ def _cmd_fsfreeze(client, args):
     if cmd == 'status':
         print(ret)
     elif cmd == 'freeze':
-        print("%d filesystems frozen" % ret)
+        print(("%d filesystems frozen" % ret))
     else:
-        print("%d filesystems thawed" % ret)
+        print(("%d filesystems thawed" % ret))
 
 
 def _cmd_fstrim(client, args):
@@ -196,15 +196,15 @@ def _cmd_fstrim(client, args):
         minimum = 0
     else:
         minimum = int(args[0])
-    print(client.fstrim(minimum))
+    print((client.fstrim(minimum)))
 
 
 def _cmd_ifconfig(client, args):
-    print(client.ifconfig())
+    print((client.ifconfig()))
 
 
 def _cmd_info(client, args):
-    print(client.info())
+    print((client.info()))
 
 
 def _cmd_ping(client, args):
@@ -214,7 +214,7 @@ def _cmd_ping(client, args):
         timeout = float(args[0])
     alive = client.ping(timeout)
     if not alive:
-        print("Not responded in %s sec" % args[0])
+        print(("Not responded in %s sec" % args[0]))
         sys.exit(1)
 
 
@@ -225,7 +225,7 @@ def _cmd_suspend(client, args):
         print(usage)
         sys.exit(1)
     if args[0] not in ['disk', 'ram', 'hybrid']:
-        print('Invalid command: ' + args[0])
+        print(('Invalid command: ' + args[0]))
         print(usage)
         sys.exit(1)
     client.suspend(args[0])
@@ -249,17 +249,17 @@ commands = [m.replace('_cmd_', '') for m in dir() if '_cmd_' in m]
 
 def main(address, cmd, args):
     if not os.path.exists(address):
-        print('%s not found' % address)
+        print(('%s not found' % address))
         sys.exit(1)
 
     if cmd not in commands:
-        print('Invalid command: ' + cmd)
-        print('Available commands: ' + ', '.join(commands))
+        print(('Invalid command: ' + cmd))
+        print(('Available commands: ' + ', '.join(commands)))
         sys.exit(1)
 
     try:
         client = QemuGuestAgentClient(address)
-    except QemuGuestAgent.error, e:
+    except QemuGuestAgent.error as e:
         import errno
 
         print(e)
