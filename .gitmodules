@@ -24,7 +24,7 @@
 	url = git://git.qemu-project.org/sgabios.git
 [submodule "pixman"]
 	path = pixman
-	url = git://anongit.freedesktop.org/pixman
+	url = https://gitlab.freedesktop.org/pixman/pixman.git
 [submodule "dtc"]
 	path = dtc
 	url = git://git.qemu-project.org/dtc.git
